@@ -38,6 +38,31 @@ def send_sms():
         return "error"
 
 
+@app.route("/send_email", methods=["POST"])
+def send_email():
+    data = request.json
+    contenido = data["contenido"]
+    destino = data["destino"]
+    asunto = data["asunto"]
+    print(contenido, destino, asunto)
+    message = Mail(
+        from_email=env["SENDGRID_FROM_EMAIL"],
+        to_emails=destino,
+        subject=asunto,
+        html_content=contenido,
+    )
+    try:
+        sg = SendGridAPIClient(env["SENDGRID_API_KEY"])
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+        return "send success"
+    except Exception as e:
+        print(e)
+        return "error"
+
+
 # Ejecutamos el servidor
 if __name__ == "__main__":
     app.run()
